@@ -2,6 +2,10 @@ import UserModel from '../model/User.model.js'
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import otpGenerator from 'otp-generator';
+import {createRequire} from 'module'
+const require=createRequire(import.meta.url);
+const dotenv=require('dotenv');
+dotenv.config();
 
 /** middleware for verify user */
 export async function verifyUser(req, res, next){
@@ -104,6 +108,7 @@ export async function login(req,res){
         return;
        }
        const ans=await bcrypt.compare(password,user.password);
+       console.log(ans)
        if(!ans)
        {
         res.status(401).send('password not match')
@@ -112,7 +117,7 @@ export async function login(req,res){
        const token = jwt.sign({
            userId: user._id,
            username : user.username
-         }, ENV.JWT_SECRET , { expiresIn : "24h"});
+         }, process.env.JWT_SECRET , { expiresIn : "24h"});
 
 
          res.status(200).send({msg:"successfully login",token:token})
@@ -120,7 +125,7 @@ export async function login(req,res){
         
     } catch (error) {
 
-        res.status(500).json('Internal server error')
+        res.status(500).send('Internal server error')
         
     }
 
